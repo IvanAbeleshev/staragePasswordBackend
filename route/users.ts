@@ -5,4 +5,6 @@ const usersRouter = Router()
 
 usersRouter.post('/', userController.createUser)
 
+usersRouter.get('/checkAdmin', userController.checkAdminUserInDb)
+
 export default usersRouter
