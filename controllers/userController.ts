@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import createAnswer from '../common/createAnswer'
-import { createToken, hashPassword } from '../common/security'
+import { compatePasswords, createToken, hashPassword } from '../common/security'
 import { typeRole } from '../interfaces/enumRole'
 import { user } from '../models'
 
@@ -42,6 +42,22 @@ class UserController{
         return createAnswer(res, 200, true, 'in db is absent user with admin role')
     }
 
+    public singIn=async(req:IRequestCreateUser, res: Response)=>{
+        const candidat = await user.findOne({where:{login: req.body.login}})
+        if(!candidat){
+            return createAnswer(res, 401, true, 'User is not finded')
+        }
+
+        console.log('user findedn')
+        
+        if(compatePasswords(req.body.password, candidat.getDataValue('password'))){
+            console.log('compare is worked')
+            const token = createToken(candidat.getDataValue('login'), <typeRole>candidat.getDataValue('role'))
+            return createAnswer(res, 200, false, 'welcome to password storage', {id: candidat.getDataValue('id'), login: candidat.getDataValue('login'), token} )
+        }
+
+        return createAnswer(res, 401, true, 'incorrect password')
+    }
 
 }
 

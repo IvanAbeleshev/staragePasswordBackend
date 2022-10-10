@@ -9,3 +9,7 @@ export const createToken=(login:string, role:typeRole)=>{
 export const hashPassword=(password: string)=>{
     return bcrypt.hashSync(password, 10)
 }
+
+export const compatePasswords=(passwordFromDB:string, passwordFromRequest:string)=>{
+    return bcrypt.compareSync(passwordFromRequest, passwordFromDB)
+}
