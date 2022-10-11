@@ -25,10 +25,10 @@ class UserController{
             return createAnswer(res, 409, true, `user with login: ${req.body.login} is exist`)
         }
         const hashedPassword = hashPassword(req.body.password)
-        const recordingData = {login: req.body.login, password: hashedPassword, role: req.body.role? req.body.password : typeRole.user}
+        const recordingData = {login: req.body.login, password: hashedPassword, role: req.body.role? req.body.role : typeRole.user}
         const userItem = await user.create(recordingData)
 
-        const token = createToken(recordingData.login, <typeRole>recordingData.role)
+        const token = createToken(userItem.getDataValue('id'), recordingData.login, <typeRole>recordingData.role)
 
         return createAnswer(res, 200, false, 'new user created', {id: userItem.getDataValue('id'), login: userItem.getDataValue('login'), token})    
     }
@@ -48,17 +48,21 @@ class UserController{
             return createAnswer(res, 401, true, 'User is not finded')
         }
 
-        console.log('user findedn')
-        
         if(compatePasswords(req.body.password, candidat.getDataValue('password'))){
-            console.log('compare is worked')
-            const token = createToken(candidat.getDataValue('login'), <typeRole>candidat.getDataValue('role'))
+            const token = createToken(candidat.getDataValue('id') ,candidat.getDataValue('login'), <typeRole>candidat.getDataValue('role'))
             return createAnswer(res, 200, false, 'welcome to password storage', {id: candidat.getDataValue('id'), login: candidat.getDataValue('login'), token} )
         }
 
         return createAnswer(res, 401, true, 'incorrect password')
     }
 
+    public checkUser=async(req: Request, res: Response)=>{
+        if(!req.user){
+            return createAnswer(res, 401, true, 'error')
+        }
+        
+        return createAnswer(res, 200, false, 'user data', {id: req.user.id, login: req.user.login, token: createToken(req.user.id, req.user.login, req.user.role)})            
+    }
 }
 
 export default new UserController

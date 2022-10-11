@@ -1,9 +1,11 @@
 import { Router } from 'express'
 import userController from '../controllers/userController'
+import { verifyToken } from '../middleware/verifyToken'
 
 const usersRouter = Router()
 
 usersRouter.post('/singIn', userController.singIn)
+usersRouter.post('/checkUser', verifyToken ,userController.checkUser)
 usersRouter.post('/', userController.createUser)
 
 

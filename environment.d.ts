@@ -1,3 +1,5 @@
+import { IUser } from './interfaces/user'
+
 declare global {
     namespace NodeJS {
       interface ProcessEnv {
@@ -9,6 +11,11 @@ declare global {
         DB_PORT: number,
         SECRET_KEY: string,
         
+      }
+    }
+    namespace Express {
+      interface Request {
+         user?: IUser 
       }
     }
   }
