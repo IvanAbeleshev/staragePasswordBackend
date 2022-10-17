@@ -23,5 +23,24 @@ const user = SequelizeInstance.define('user', {
     },
 })
 
+const servises = SequelizeInstance.define('servises',{
+    id:{
+        type: DataType.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
+    img:{
+        type: DataType.STRING,
+        allowNull: false
+    },
+    name:{
+        type: DataType.STRING,
+        allowNull: true
+    },
+    description:{
+        type: DataType.STRING,
+        allowNull: false
+    }
+})
 
-export {user}
+export {user, servises}

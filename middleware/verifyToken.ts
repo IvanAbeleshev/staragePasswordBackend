@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken'
 import { IUser } from '../interfaces/user'
 
 export const verifyToken = (req: Request , res: Response, next: NextFunction) =>{
-    const token = req.body.token || req.query.token || req.headers['x-access-token'] || req.headers['authorization']!.split(' ')[1]
+    const token = req.body.token || req.query.token || req.headers['x-access-token'] || req.headers['authorization']?.split(' ')[1]
 
     if (!token) {
         return createAnswer(res, 403, true, 'A token is required for authentication')
