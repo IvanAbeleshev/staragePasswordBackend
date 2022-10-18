@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import servisesContoller from '../controllers/servisesContoller'
+import servisesContoller from '../controllers/servicesContoller'
 import checkAdminRole from '../middleware/adminRole'
 import { verifyToken } from '../middleware/verifyToken'
 

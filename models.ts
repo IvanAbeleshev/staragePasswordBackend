@@ -23,7 +23,7 @@ const user = SequelizeInstance.define('user', {
     },
 })
 
-const servises = SequelizeInstance.define('servises',{
+const services = SequelizeInstance.define('services',{
     id:{
         type: DataType.INTEGER,
         primaryKey: true,
@@ -43,4 +43,4 @@ const servises = SequelizeInstance.define('servises',{
     }
 })
 
-export {user, servises}
+export {user, services}

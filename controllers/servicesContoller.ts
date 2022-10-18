@@ -1,6 +1,6 @@
 import { Request, Response } from "express"
 import createAnswer from "../common/createAnswer"
-import { servises } from "../models"
+import { services } from "../models"
 
 interface IRequestGetAll extends Request{
     params:{
@@ -17,22 +17,22 @@ interface IRequestCreateOne extends Request{
     }
 }
 
-class ServisesController{
+class ServicesController{
 
     public getAll=async(req: IRequestGetAll, res: Response)=>{
         const page = Number(req.params.page) || 1
         const limit = Number(req.params.limit) || 15
         const offset = (page-1)*limit
-        const data = await servises.findAndCountAll({limit, offset})
+        const data = await services.findAndCountAll({limit, offset})
 
-        return createAnswer(res, 200, false, 'list servises', data)
+        return createAnswer(res, 200, false, 'list services', data)
     }
 
     public createOne=async(req: IRequestCreateOne, res: Response)=>{
-        const createdElement = await servises.create(req.body)
+        const createdElement = await services.create(req.body)
 
-        return createAnswer(res, 200, false, 'Create new servise', createdElement)
+        return createAnswer(res, 200, false, 'Create new service', createdElement)
     }
 }
 
-export default new ServisesController
+export default new ServicesController
