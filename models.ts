@@ -31,15 +31,15 @@ const services = SequelizeInstance.define('services',{
     },
     img:{
         type: DataType.STRING,
-        allowNull: false
+        allowNull: true
     },
     name:{
         type: DataType.STRING,
-        allowNull: true
+        allowNull: false
     },
     description:{
         type: DataType.STRING,
-        allowNull: false
+        allowNull: true
     }
 })
 
