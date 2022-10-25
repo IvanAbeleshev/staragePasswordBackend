@@ -35,11 +35,10 @@ interface IRequestCreateOne extends Request{
 class ServicesController{
 
     public getAll=async(req: IRequestGetAll, res: Response)=>{
-        console.log(req.query)
         const page = Number(req.query.page) || 1
         const limit = Number(req.query.limit) || 15
         const offset = (page-1)*limit
-        const data = await services.findAndCountAll({limit, offset})
+        const data = await services.findAndCountAll({limit, offset, order:[['id', 'ASC']]})
 
         return createAnswer(res, 200, false, 'list services', data)
     }
@@ -62,8 +61,7 @@ class ServicesController{
         const id = Number(req.query.id)
 
         try{
-            const element = await services.findOne({where:{id}})
-            await element?.update(req.body)
+            await services.update(req.body, {where:{id}})
             return createAnswer(res, 200, false, `Data elemet with id: ${id} is updated`)
         }catch(error){
 

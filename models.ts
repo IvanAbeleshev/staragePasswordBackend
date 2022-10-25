@@ -43,4 +43,36 @@ const services = SequelizeInstance.define('services',{
     }
 })
 
-export {user, services}
+const employees = SequelizeInstance.define('employees',{
+    id:{
+        type: DataType.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
+    name:{
+        type: DataType.STRING,
+        allowNull: false   
+    },
+    jobTitle:{
+        type: DataType.STRING,
+        allowNull: true    
+    },
+    employmentDate:{
+        type: DataType.DATE,
+        allowNull: true     
+    },
+    dismissDate:{
+        type: DataType.DATE,
+        allowNull: true   
+    },
+    img:{
+        type: DataType.STRING,
+        allowNull: true
+    },
+    comment:{
+        type: DataType.STRING,
+        allowNull: true   
+    }
+})
+
+export {user, services, employees}
