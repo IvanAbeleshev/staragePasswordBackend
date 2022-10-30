@@ -5,6 +5,12 @@ import { employees } from '../models'
 import path from 'path'
 import {v4} from 'uuid'
 
+interface IRequestGetOne extends Request{
+    query:{
+        id: string,
+    }
+}
+
 interface IRequestGetAll extends Request{
     query:{
         page?: string,
@@ -59,6 +65,13 @@ class EmployeesController{
         }
 
         return createAnswer(res, 200, false, 'created new element')
+    }
+
+    public getOne=async(req:IRequestGetOne, res: Response)=>{
+        const id = Number(req.query.id)
+        const employeeItem = await employees.findOne({where:{id}})
+
+        return createAnswer(res, 200, false, `get data item with id ${id}`, employeeItem!)
     }
 
 }
