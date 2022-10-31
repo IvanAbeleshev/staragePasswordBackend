@@ -8,5 +8,6 @@ employeesRouter.get('/', verifyToken, employeesController.getAll)
 employeesRouter.get('/getOne', verifyToken, employeesController.getOne)
 
 employeesRouter.post('/createOne', verifyToken, employeesController.createOne)
+employeesRouter.post('/changeOne', verifyToken, employeesController.changeOne)
 
 export default employeesRouter
