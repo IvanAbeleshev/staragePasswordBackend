@@ -41,7 +41,7 @@ interface IRequestChangeOne extends IRequestGetOne{
         comment?:string
     }
 }
-const moveFile=(files: fileUpload.FileArray, imgName:string|undefined)=>{
+const moveFile=(files: fileUpload.FileArray):string|undefined=>{
     const arrayFilesName: string[] = []
     for(let item in files){
         
@@ -49,10 +49,13 @@ const moveFile=(files: fileUpload.FileArray, imgName:string|undefined)=>{
         let fileName = v4()+'.jpeg'
         currentFile.mv(path.resolve(__dirname, '..', 'static', fileName))
         arrayFilesName.push(fileName)
-        if(!imgName){
-            imgName = fileName
-        }
+    
     }
+
+    if(arrayFilesName.length>0){
+        return arrayFilesName[0]
+    }
+
 }
 
 class EmployeesController{
@@ -61,16 +64,15 @@ class EmployeesController{
         const limit = Number(req.query.limit) || 15
         const offset = (numberPage-1)*limit
         
-        const result = await employees.findAndCountAll({limit, offset})    
+        const result = await employees.findAndCountAll({limit, offset, order:[['id', 'ASC']]})    
         return createAnswer(res, 200, false, 'List of employees', result)
     }
 
     public createOne=async(req:IRequestCreateOne, res: Response)=>{
-        
         //need add block to check files and place its to special folder
         let img
         if(req.files){
-            moveFile(req.files, img)
+            img = moveFile(req.files)
         }
         
         if(img)
@@ -92,15 +94,17 @@ class EmployeesController{
 
     public changeOne=async(req: IRequestChangeOne, res: Response)=>{
         const id = Number(req.query.id)
-        delete req.body.id
+        // delete req.body.id
         let img
         if(req.files){
             //remove file and
             const employee = await employees.findOne({where:{id}})
             const imgName = employee?.getDataValue('img')
-            fs.unlinkSync(path.resolve(__dirname, '..', 'static', imgName))
+            if(employee?.getDataValue('img')){
+                fs.unlinkSync(path.resolve(__dirname, '..', 'static', imgName))
+            }
             
-            moveFile(req.files, img)
+            img = moveFile(req.files)
         }
 
         try{
