@@ -1,18 +1,19 @@
 import { Request, Response } from "express"
-import { where } from "sequelize"
+import { Sequelize, where } from "sequelize"
 import createAnswer from "../common/createAnswer"
 import { services } from "../models"
 
 interface IRequestGetAll extends Request{
     query:{
         page: string,
-        limit: string
+        limit: string,
+        searchString?: string
     }
 }
 
 interface IRequestGetOne extends Request{
     query:{
-        id: string
+        id: string,
     }
 }
 
@@ -38,7 +39,13 @@ class ServicesController{
         const page = Number(req.query.page) || 1
         const limit = Number(req.query.limit) || 15
         const offset = (page-1)*limit
-        const data = await services.findAndCountAll({limit, offset, order:[['id', 'ASC']]})
+        let data
+        if(req.query.searchString){
+            data = await services.findAndCountAll({where:{name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('name')), 'LIKE', '%' + req.query.searchString + '%')}, limit, offset, order:[['id', 'ASC']]})
+        }else{
+            data = await services.findAndCountAll({limit, offset, order:[['id', 'ASC']]})            
+        }
+        
 
         return createAnswer(res, 200, false, 'list services', data)
     }

@@ -5,6 +5,8 @@ import { employees } from '../models'
 import path from 'path'
 import {v4} from 'uuid'
 import fs from 'fs'
+import { Sequelize } from 'sequelize'
+import {Op} from 'sequelize'
 
 interface IRequestGetOne extends Request{
     query:{
@@ -15,7 +17,8 @@ interface IRequestGetOne extends Request{
 interface IRequestGetAll extends Request{
     query:{
         page?: string,
-        limit?: string
+        limit?: string,
+        searchString?: string
     }
 }
 
@@ -63,8 +66,17 @@ class EmployeesController{
         const numberPage = Number(req.query.page) || 1
         const limit = Number(req.query.limit) || 15
         const offset = (numberPage-1)*limit
+        let result
+        if(req.query.searchString){
+            result = await employees.findAndCountAll({where: {[Op.or]:[
+                {name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('name')), 'LIKE', '%' + req.query.searchString + '%')},
+                {jobTitle: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('jobTitle')), 'LIKE', '%' + req.query.searchString + '%')},
+                {comment: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('comment')), 'LIKE', '%' + req.query.searchString + '%')},
+            ]}, limit, offset, order:[['id', 'ASC']]})    
+        }else{
+            result = await employees.findAndCountAll({limit, offset, order:[['id', 'ASC']]})    
+        }
         
-        const result = await employees.findAndCountAll({limit, offset, order:[['id', 'ASC']]})    
         return createAnswer(res, 200, false, 'List of employees', result)
     }
 
