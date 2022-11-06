@@ -69,9 +69,9 @@ class EmployeesController{
         let result
         if(req.query.searchString){
             result = await employees.findAndCountAll({where: {[Op.or]:[
-                {name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('name')), 'LIKE', '%' + req.query.searchString + '%')},
-                {jobTitle: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('jobTitle')), 'LIKE', '%' + req.query.searchString + '%')},
-                {comment: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('comment')), 'LIKE', '%' + req.query.searchString + '%')},
+                {name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('name')), 'LIKE', '%' + req.query.searchString.toLocaleLowerCase() + '%')},
+                {jobTitle: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('jobTitle')), 'LIKE', '%' + req.query.searchString.toLowerCase() + '%')},
+                {comment: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('comment')), 'LIKE', '%' + req.query.searchString.toLowerCase() + '%')},
             ]}, limit, offset, order:[['id', 'ASC']]})    
         }else{
             result = await employees.findAndCountAll({limit, offset, order:[['id', 'ASC']]})    

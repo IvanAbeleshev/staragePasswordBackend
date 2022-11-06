@@ -41,7 +41,7 @@ class ServicesController{
         const offset = (page-1)*limit
         let data
         if(req.query.searchString){
-            data = await services.findAndCountAll({where:{name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('name')), 'LIKE', '%' + req.query.searchString + '%')}, limit, offset, order:[['id', 'ASC']]})
+            data = await services.findAndCountAll({where:{name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('name')), 'LIKE', '%' + req.query.searchString.toLowerCase() + '%')}, limit, offset, order:[['id', 'ASC']]})
         }else{
             data = await services.findAndCountAll({limit, offset, order:[['id', 'ASC']]})            
         }
