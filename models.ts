@@ -75,4 +75,30 @@ const employees = SequelizeInstance.define('employees',{
     }
 })
 
-export {user, services, employees}
+const passwordStorage = SequelizeInstance.define('passwordStorage',{
+    id:{
+        type: DataType.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
+    login:{
+        type: DataType.STRING,
+        allowNull: true
+    },
+    password:{
+        type: DataType.STRING,
+        allowNull: false
+    },
+    comment:{
+        type: DataType.STRING,
+        allowNull: true
+    }
+})
+
+employees.hasMany(passwordStorage)
+passwordStorage.belongsTo(employees)
+
+services.hasMany(passwordStorage)
+passwordStorage.belongsTo(services)
+
+export {user, services, employees, passwordStorage}
