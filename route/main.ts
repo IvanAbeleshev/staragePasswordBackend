@@ -9,6 +9,6 @@ const mainRouter = Router()
 mainRouter.use('/users', usersRouter)
 mainRouter.use('/services', servicesRouter)
 mainRouter.use('/employees', employeesRouter)
-mainRouter.use('/passwoeds', passwordsRouter)
+mainRouter.use('/passwords', passwordsRouter)
 
 export default mainRouter

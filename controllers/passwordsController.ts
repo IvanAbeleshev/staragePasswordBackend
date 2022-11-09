@@ -1,7 +1,7 @@
 import { Request, Response } from "express"
 import { WhereOptions } from "sequelize"
 import createAnswer from "../common/createAnswer"
-import { passwordStorage } from "../models"
+import { employees, passwordStorage, services } from "../models"
 
 interface IRequestGetAll extends Request{
     query:{
@@ -12,6 +12,15 @@ interface IRequestGetAll extends Request{
     }
 }
 
+interface IRequestPasswordItem extends Request{
+    body:{
+        serviceId: number,
+        employeeId: number,
+        password: string,
+        login?: string,
+        comment?: string
+    }
+}
 
 class PasswordsController{
     public getAll=async(req: IRequestGetAll, res: Response)=>{
@@ -28,8 +37,13 @@ class PasswordsController{
             selectionParams.serviceId = Number(req.query.serviceId)
         }
 
-        const result = await passwordStorage.findAndCountAll({where: selectionParams, offset, limit})
+        const result = await passwordStorage.findAndCountAll({where: selectionParams, offset, limit, include: [{model: employees}, {model: services}], order:[['id', 'ASC']]})
         return createAnswer(res, 200, false, 'passwords data', result)
+    }
+
+    public create=async(req: IRequestPasswordItem, res: Response)=>{
+        const result = await passwordStorage.create(req.body)
+        return createAnswer(res, 200, false, 'created new password item', result)
     }
 }
 
