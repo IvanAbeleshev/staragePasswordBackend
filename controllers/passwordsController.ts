@@ -1,7 +1,8 @@
 import { Request, Response } from "express"
-import { WhereOptions } from "sequelize"
+import { where, WhereOptions } from "sequelize"
 import createAnswer from "../common/createAnswer"
 import { employees, passwordStorage, services } from "../models"
+import CryptoJS from "crypto-js"
 
 interface IRequestGetAll extends Request{
     query:{
@@ -19,6 +20,12 @@ interface IRequestPasswordItem extends Request{
         password: string,
         login?: string,
         comment?: string
+    }
+}
+
+interface IRequestGetOne extends Request{
+    query:{
+        id: string
     }
 }
 
@@ -42,8 +49,19 @@ class PasswordsController{
     }
 
     public create=async(req: IRequestPasswordItem, res: Response)=>{
-        const result = await passwordStorage.create(req.body)
+        const ciphertext = CryptoJS.AES.encrypt(req.body.password, process.env.CRYPTO_KEY).toString()
+        const result = await passwordStorage.create({...req.body, password: ciphertext})
+
         return createAnswer(res, 200, false, 'created new password item', result)
+    }
+
+    public getOne=async(req: Request, res: Response)=>{
+        const id = Number(req.query.id)
+        const result = await passwordStorage.findOne({where:{id}, include: [{model: employees}, {model: services}]})
+        const bytes  = CryptoJS.AES.decrypt(result?.getDataValue('password'), process.env.CRYPTO_KEY)
+        const password = bytes.toString(CryptoJS.enc.Utf8)
+
+        return createAnswer(res, 200, false, 'data of password', {...result?.get(), password})
     }
 }
 

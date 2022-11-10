@@ -10,7 +10,7 @@ declare global {
         DB_HOST: string,
         DB_PORT: number,
         SECRET_KEY: string,
-        
+        CRYPTO_KEY: string,
       }
     }
     namespace Express {
