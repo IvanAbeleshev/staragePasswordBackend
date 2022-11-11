@@ -29,6 +29,12 @@ interface IRequestGetOne extends Request{
     }
 }
 
+interface IRequestChangeItem extends IRequestPasswordItem{
+    query:{
+        id: string
+    }   
+}
+
 class PasswordsController{
     public getAll=async(req: IRequestGetAll, res: Response)=>{
       
@@ -55,13 +61,28 @@ class PasswordsController{
         return createAnswer(res, 200, false, 'created new password item', result)
     }
 
-    public getOne=async(req: Request, res: Response)=>{
+    public getOne=async(req: IRequestGetOne, res: Response)=>{
         const id = Number(req.query.id)
         const result = await passwordStorage.findOne({where:{id}, include: [{model: employees}, {model: services}]})
+
+        return createAnswer(res, 200, false, 'data of password', result?.get())
+    }
+
+    public getCorectPassword=async(req: IRequestGetOne, res: Response)=>{
+        const id = Number(req.query.id)
+        const result = await passwordStorage.findOne({where:{id}})
         const bytes  = CryptoJS.AES.decrypt(result?.getDataValue('password'), process.env.CRYPTO_KEY)
         const password = bytes.toString(CryptoJS.enc.Utf8)
 
-        return createAnswer(res, 200, false, 'data of password', {...result?.get(), password})
+        return createAnswer(res, 200, false, 'data of password', password)
+    }
+
+    public changeItem=async(req: IRequestChangeItem, res: Response)=>{
+        const id = Number(req.query.id)
+        const ciphertext = CryptoJS.AES.encrypt(req.body.password, process.env.CRYPTO_KEY).toString()
+        const result = await passwordStorage.update({...req.body, password: ciphertext}, {where: {id}})
+
+        return createAnswer(res, 200, false, 'item is updated', result)
     }
 }
 
