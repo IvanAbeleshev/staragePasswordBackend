@@ -1,4 +1,5 @@
 import { Request, Response } from 'express'
+import { Sequelize } from 'sequelize'
 import createAnswer from '../common/createAnswer'
 import { compatePasswords, createToken, hashPassword } from '../common/security'
 import { typeRole } from '../interfaces/enumRole'
@@ -10,6 +11,19 @@ interface IRequestCreateUser extends Request{
         login: string,
         password: string,
         role?: typeRole
+    }
+}
+
+interface IRequestGetOne extends Request{
+    query:{
+        id?: string
+    }
+}
+interface IRequestGetAll extends Request{
+    query:{
+        page?: string,
+        limit?: string,
+        searchString?: string
     }
 }
 
@@ -62,6 +76,28 @@ class UserController{
         }
         
         return createAnswer(res, 200, false, 'user data', {id: req.user.id, login: req.user.login, token: createToken(req.user.id, req.user.login, req.user.role)})            
+    }
+
+    public getAll=async(req: IRequestGetAll, res: Response)=>{
+        const page = Number(req.query.page) || 1
+        const limit = Number(req.query.limit) || 15
+        const offset = (page-1)*limit
+
+        let result
+        if(req.query.searchString){
+            result = await user.findAndCountAll({where:{name: Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('name')), 'LIKE', '%' + req.query.searchString.toLowerCase() + '%')},attributes:['id', 'login', 'createdAt', 'updatedAt'] ,limit, offset, order:[['id', 'ASC']]})
+        }else{
+            result = await user.findAndCountAll({attributes:['id', 'login', 'createdAt', 'updatedAt'] ,limit, offset, order:[['id', 'ASC']]})
+        }
+
+        return createAnswer(res, 200, false, 'list of users', result)
+    }
+
+    public getOne=async(req: IRequestGetOne, res: Response)=>{
+        const id = Number(req.query.id)
+        const result = await user.findOne({attributes:['id', 'login', 'role'], where:{id}})
+
+        return createAnswer(res, 200, false, 'user data', result?.get())
     }
 }
 

@@ -5,11 +5,12 @@ import { verifyToken } from '../middleware/verifyToken'
 const usersRouter = Router()
 
 usersRouter.post('/singIn', userController.singIn)
-usersRouter.get('/checkUser', verifyToken ,userController.checkUser)
 usersRouter.post('/', userController.createUser)
 
-
+usersRouter.get('/checkUser', verifyToken ,userController.checkUser)
 usersRouter.get('/checkAdmin', userController.checkAdminUserInDb)
+usersRouter.get('/', verifyToken, userController.getAll)
+usersRouter.get('/getOne', verifyToken, userController.getOne)
 
 
 export default usersRouter
