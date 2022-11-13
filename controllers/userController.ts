@@ -27,6 +27,12 @@ interface IRequestGetAll extends Request{
     }
 }
 
+interface IRequestChangeUser extends IRequestCreateUser{
+    query:{
+        id?: string
+    }    
+}
+
 class UserController{
 
     public createUser = async(req: IRequestCreateUser, res: Response) =>{
@@ -98,6 +104,15 @@ class UserController{
         const result = await user.findOne({attributes:['id', 'login', 'role'], where:{id}})
 
         return createAnswer(res, 200, false, 'user data', result?.get())
+    }
+
+    public changeUser = async(req: IRequestChangeUser, res: Response) =>{
+        const id = Number(req.query.id)
+        const hashedPassword = hashPassword(req.body.password)
+        const recordingData = {login: req.body.login, password: hashedPassword, role: req.body.role? req.body.role : typeRole.user}
+        const userItem = await user.update(recordingData, {where:{id}})
+
+        return createAnswer(res, 200, false, 'new user created', userItem)    
     }
 }
 
