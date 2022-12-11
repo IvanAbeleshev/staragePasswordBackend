@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import { Sequelize } from 'sequelize'
 import createAnswer from '../common/createAnswer'
-import { compatePasswords, createToken, hashPassword } from '../common/security'
+import { compatePasswords, createAccessToken, createRefreshToken, hashPassword } from '../common/security'
 import { typeRole } from '../interfaces/enumRole'
 import { user } from '../models'
 
@@ -48,9 +48,10 @@ class UserController{
         const recordingData = {login: req.body.login, password: hashedPassword, role: req.body.role? req.body.role : typeRole.user}
         const userItem = await user.create(recordingData)
 
-        const token = createToken(userItem.getDataValue('id'), recordingData.login, <typeRole>recordingData.role)
+        const accessToken = createAccessToken(userItem.getDataValue('id'), recordingData.login, <typeRole>recordingData.role)
+        const refreshToken = createRefreshToken(userItem.getDataValue('id'), recordingData.login, <typeRole>recordingData.role)
 
-        return createAnswer(res, 200, false, 'new user created', {id: userItem.getDataValue('id'), login: userItem.getDataValue('login'), token})    
+        return createAnswer(res, 200, false, 'new user created', {id: userItem.getDataValue('id'), login: userItem.getDataValue('login'), accessToken, refreshToken})    
     }
 
     public checkAdminUserInDb = async(req: Request, res: Response)=>{
@@ -69,8 +70,11 @@ class UserController{
         }
 
         if(compatePasswords(req.body.password, candidat.getDataValue('password'))){
-            const token = createToken(candidat.getDataValue('id') ,candidat.getDataValue('login'), <typeRole>candidat.getDataValue('role'))
-            return createAnswer(res, 200, false, 'welcome to password storage', {id: candidat.getDataValue('id'), login: candidat.getDataValue('login'), token} )
+
+            const accessToken = createAccessToken(candidat.getDataValue('id') ,candidat.getDataValue('login'), <typeRole>candidat.getDataValue('role'))
+            const refreshToken = createRefreshToken(candidat.getDataValue('id') ,candidat.getDataValue('login'), <typeRole>candidat.getDataValue('role'))
+
+            return createAnswer(res, 200, false, 'welcome to password storage', {id: candidat.getDataValue('id'), login: candidat.getDataValue('login'), accessToken, refreshToken} )
         }
 
         return createAnswer(res, 401, true, 'incorrect password')
@@ -81,7 +85,10 @@ class UserController{
             return createAnswer(res, 401, true, 'error')
         }
         
-        return createAnswer(res, 200, false, 'user data', {id: req.user.id, login: req.user.login, token: createToken(req.user.id, req.user.login, req.user.role)})            
+        const accessToken = createAccessToken(req.user.id, req.user.login, req.user.role)
+        const refreshToken = createRefreshToken(req.user.id, req.user.login, req.user.role)
+
+        return createAnswer(res, 200, false, 'user data', {id: req.user.id, login: req.user.login, accessToken, refreshToken})            
     }
 
     public getAll=async(req: IRequestGetAll, res: Response)=>{

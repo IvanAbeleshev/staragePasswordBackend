@@ -2,8 +2,12 @@ import jwt from 'jsonwebtoken'
 import { typeRole } from '../interfaces/enumRole'
 import bcrypt from 'bcrypt'
 
-export const createToken=(id:number, login:string, role:typeRole)=>{
-    return jwt.sign({id, login, role}, process.env.SECRET_KEY, {expiresIn: 1800})
+export const createAccessToken=(id:number, login:string, role:typeRole)=>{
+    return jwt.sign({id, login, role}, process.env.SECRET_KEY, {expiresIn: 600})
+}
+
+export const createRefreshToken=(id:number, login:string, role:typeRole)=>{
+    return jwt.sign({id, login, role}, process.env.SECRET_KEY, {expiresIn: '30d'})
 }
 
 export const hashPassword=(password: string)=>{
