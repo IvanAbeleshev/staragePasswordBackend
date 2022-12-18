@@ -49,7 +49,7 @@ class UserController{
         const userItem = await user.create(recordingData)
 
         const accessToken = createAccessToken(userItem.getDataValue('id'), recordingData.login, <typeRole>recordingData.role)
-        const refreshToken = createRefreshToken(userItem.getDataValue('id'), recordingData.login, <typeRole>recordingData.role)
+        const refreshToken = createRefreshToken(userItem.getDataValue('id'))
 
         return createAnswer(res, 200, false, 'new user created', {id: userItem.getDataValue('id'), login: userItem.getDataValue('login'), accessToken, refreshToken})    
     }
@@ -72,7 +72,7 @@ class UserController{
         if(compatePasswords(req.body.password, candidat.getDataValue('password'))){
 
             const accessToken = createAccessToken(candidat.getDataValue('id') ,candidat.getDataValue('login'), <typeRole>candidat.getDataValue('role'))
-            const refreshToken = createRefreshToken(candidat.getDataValue('id') ,candidat.getDataValue('login'), <typeRole>candidat.getDataValue('role'))
+            const refreshToken = createRefreshToken(candidat.getDataValue('id'))
 
             return createAnswer(res, 200, false, 'welcome to password storage', {id: candidat.getDataValue('id'), login: candidat.getDataValue('login'), accessToken, refreshToken} )
         }
@@ -84,9 +84,8 @@ class UserController{
         if(!req.user){
             return createAnswer(res, 401, true, 'error')
         }
-        
         const accessToken = createAccessToken(req.user.id, req.user.login, req.user.role)
-        const refreshToken = createRefreshToken(req.user.id, req.user.login, req.user.role)
+        const refreshToken = createRefreshToken(req.user.id)
 
         return createAnswer(res, 200, false, 'user data', {id: req.user.id, login: req.user.login, accessToken, refreshToken})            
     }

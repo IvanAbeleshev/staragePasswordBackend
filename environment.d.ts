@@ -10,6 +10,7 @@ declare global {
         DB_HOST: string,
         DB_PORT: number,
         SECRET_KEY: string,
+        SECRET_KEY_REFRESH: string,
         CRYPTO_KEY: string,
       }
     }

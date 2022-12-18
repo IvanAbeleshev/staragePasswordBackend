@@ -3,10 +3,10 @@ import fileUpload, { UploadedFile } from 'express-fileupload'
 import createAnswer from '../common/createAnswer'
 import { employees } from '../models'
 import path from 'path'
-import {v4} from 'uuid'
 import fs from 'fs'
 import { Sequelize } from 'sequelize'
 import {Op} from 'sequelize'
+import { moveFile } from '../common/additionalFS'
 
 interface IRequestGetOne extends Request{
     query:{
@@ -43,22 +43,6 @@ interface IRequestChangeOne extends IRequestGetOne{
         img?: string,
         comment?:string
     }
-}
-const moveFile=(files: fileUpload.FileArray):string|undefined=>{
-    const arrayFilesName: string[] = []
-    for(let item in files){
-        
-        const currentFile: UploadedFile = <UploadedFile>files[item];
-        let fileName = v4()+'.jpeg'
-        currentFile.mv(path.resolve(__dirname, '..', 'static', fileName))
-        arrayFilesName.push(fileName)
-    
-    }
-
-    if(arrayFilesName.length>0){
-        return arrayFilesName[0]
-    }
-
 }
 
 class EmployeesController{

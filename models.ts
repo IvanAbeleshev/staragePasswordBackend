@@ -92,6 +92,31 @@ const passwordStorage = SequelizeInstance.define('passwordStorage',{
     comment:{
         type: DataType.STRING,
         allowNull: true
+    },
+    supplementKey:{
+        type: DataType.STRING,
+        allowNull: false
+    }
+})
+
+const passwordGroup = SequelizeInstance.define('passwordGroup',{
+    id:{
+        type: DataType.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
+    name:{
+        type: DataType.STRING,
+        allowNull: false,
+        defaultValue: 'Personal'
+    },
+    icon:{
+        type: DataType.STRING,
+        allowNull: true
+    },
+    idOwner:{
+        type: DataType.INTEGER,
+        allowNull: true
     }
 })
 
@@ -101,4 +126,7 @@ passwordStorage.belongsTo(employees)
 services.hasMany(passwordStorage)
 passwordStorage.belongsTo(services)
 
-export {user, services, employees, passwordStorage}
+passwordGroup.hasMany(passwordStorage)
+passwordStorage.belongsTo(passwordGroup)
+
+export {user, services, employees, passwordStorage, passwordGroup}

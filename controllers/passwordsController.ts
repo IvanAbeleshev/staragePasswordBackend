@@ -1,8 +1,9 @@
-import { Request, Response } from "express"
-import { where, WhereOptions } from "sequelize"
-import createAnswer from "../common/createAnswer"
-import { employees, passwordStorage, services } from "../models"
-import CryptoJS from "crypto-js"
+import { Request, Response } from 'express'
+import { where, WhereOptions } from 'sequelize'
+import createAnswer from '../common/createAnswer'
+import { employees, passwordStorage, services } from '../models'
+import CryptoJS from 'crypto-js'
+import {v4} from 'uuid'
 
 interface IRequestGetAll extends Request{
     query:{
@@ -55,8 +56,9 @@ class PasswordsController{
     }
 
     public create=async(req: IRequestPasswordItem, res: Response)=>{
-        const ciphertext = CryptoJS.AES.encrypt(req.body.password, process.env.CRYPTO_KEY).toString()
-        const result = await passwordStorage.create({...req.body, password: ciphertext})
+        const supplementKey = v4()
+        const ciphertext = CryptoJS.AES.encrypt(req.body.password, process.env.CRYPTO_KEY+supplementKey).toString()
+        const result = await passwordStorage.create({...req.body, supplementKey, password: ciphertext})
 
         return createAnswer(res, 200, false, 'created new password item', result)
     }
@@ -71,7 +73,7 @@ class PasswordsController{
     public getCorectPassword=async(req: IRequestGetOne, res: Response)=>{
         const id = Number(req.query.id)
         const result = await passwordStorage.findOne({where:{id}})
-        const bytes  = CryptoJS.AES.decrypt(result?.getDataValue('password'), process.env.CRYPTO_KEY)
+        const bytes  = CryptoJS.AES.decrypt(result?.getDataValue('password'), process.env.CRYPTO_KEY+result?.getDataValue('supplementKey'))
         const password = bytes.toString(CryptoJS.enc.Utf8)
 
         return createAnswer(res, 200, false, 'data of password', password)
@@ -79,8 +81,9 @@ class PasswordsController{
 
     public changeItem=async(req: IRequestChangeItem, res: Response)=>{
         const id = Number(req.query.id)
-        const ciphertext = CryptoJS.AES.encrypt(req.body.password, process.env.CRYPTO_KEY).toString()
-        const result = await passwordStorage.update({...req.body, password: ciphertext}, {where: {id}})
+        const supplementKey = v4()
+        const ciphertext = CryptoJS.AES.encrypt(req.body.password, process.env.CRYPTO_KEY+supplementKey).toString()
+        const result = await passwordStorage.update({...req.body, supplementKey, password: ciphertext}, {where: {id}})
 
         return createAnswer(res, 200, false, 'item is updated', result)
     }

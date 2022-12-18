@@ -5,11 +5,10 @@ import { typeRole } from "../interfaces/enumRole"
 const checkAdminRole=(req: Request, res: Response, next: NextFunction)=>{
     if(req.user){
         if(req.user.role === typeRole.user){
-            return createAnswer(res, 403, true, 'You rule is limited. Operation is canceled')
+            return createAnswer(res, 401, true, 'You rule is limited. Operation is canceled')
         }
     }
-
-    next()
+    return next()
 }
 
 export default checkAdminRole
