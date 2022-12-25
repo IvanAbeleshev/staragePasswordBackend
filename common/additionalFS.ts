@@ -3,7 +3,10 @@ import fs from 'fs'
 import fileUpload, { UploadedFile } from 'express-fileupload'
 import { v4 } from 'uuid'
 
-export const moveFile=(files: fileUpload.FileArray):string|undefined=>{
+export const moveFile=(files: fileUpload.FileArray | undefined | null):string|undefined=>{
+  if(!files){
+    return undefined
+  }
   const arrayFilesName: string[] = []
   const isCatalogExist = fs.existsSync(path.resolve(__dirname, '..', 'static'))
   if(!isCatalogExist){
@@ -22,5 +25,7 @@ export const moveFile=(files: fileUpload.FileArray):string|undefined=>{
   if(arrayFilesName.length>0){
       return arrayFilesName[0]
   }
+  
+  return undefined
 
 }

@@ -11,20 +11,19 @@ interface iRequestcreateGroup extends Request{
 }
 
 class PasswordGroupController{
-  public createGroup=async(req: iRequestcreateGroup, res:Response)=>{
-    let icon
-    if(req.files){
-        icon = moveFile(req.files)
-    }
+  public createGroup=async(req:iRequestcreateGroup, res:Response)=>{
+    const icon = moveFile(req.files)
     
-    if(icon)
-    {
-        await passwordGroup.create({...req.body, icon})
-    }else{
-        await passwordGroup.create(req.body)
-    }
+    const createdItem = icon?await passwordGroup.create({...req.body, icon}):await passwordGroup.create(req.body)
 
-    return createAnswer(res, 200, false, 'created new element')
+    return createAnswer(res, 200, false, 'created new element', createdItem.get())
+  }
+
+  public getAll=async(req:Request, res:Response)=>{
+    //need rework selection by permission access in future
+    const dataGroup = await passwordGroup.findAll()
+    
+    return createAnswer(res, 200, false, 'data of groups', dataGroup)
   }
 }
 
